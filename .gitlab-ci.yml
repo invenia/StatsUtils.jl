@@ -1,3 +1,7 @@
+stages:
+  - test
+  - docs
+
 .test_template: &test_definition
   # Uncomment below if you would like to run the tests on specific references
   # only, such as the branches `master`, `develop`, etc.
