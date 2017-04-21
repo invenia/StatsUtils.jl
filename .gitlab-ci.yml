@@ -2,8 +2,8 @@ stages:
   - test
   - coverage
   - docs
+
 .test_template: &test_definition
-  coverage: /Test Coverage (\d+\.\d+%)/
   artifacts:
     name: "$CI_JOB_NAME coverage"
     expire_in: 1 week
@@ -19,45 +19,57 @@ stages:
     - ./julia-ci coverage
   after_script:
     - ./julia-ci clean
+
 .test_tmp_release: &test_release
   variables:
     JULIA_VERSION: release
   <<: *test_definition
+
 .test_tmp_nightly: &test_nightly
   variables:
     JULIA_VERSION: nightly
   allow_failure: true
   <<: *test_definition
+
+
 "Julia release, OS X":
   tags:
     - osx
   <<: *test_release
+
 "Julia release, Linux (i386)":
   tags:
     - linux
     - i386
   <<: *test_release
+
 "Julia release, Linux (amd64)":
   tags:
     - linux
     - amd64
   <<: *test_release
+
 "Julia nightly, OS X":
   tags:
     - osx
   <<: *test_nightly
+
 "Julia nightly, Linux (i386)":
   tags:
     - linux
     - i386
   <<: *test_nightly
+
 "Julia nightly, Linux (amd64)":
   tags:
     - linux
     - amd64
   <<: *test_nightly
+
+
 "Coverage":
   stage: coverage
+  coverage: /Test Coverage (\d+\.\d+%)/
   artifacts:
     name: combined_coverage
     expire_in: 1 week
@@ -70,8 +82,11 @@ stages:
     - genhtml --version
     - mkdir $CI_PROJECT_DIR/combined_coverage
     - cp -r $CI_PROJECT_DIR/src $CI_PROJECT_DIR/combined_coverage/
-    - genhtml -o $CI_PROJECT_DIR/combined_coverage --no-prefix */coverage.info
+    - ls */*.info | xargs -I{} echo '--summary "{}"' | xargs lcov --directory src
+    - echo "Test Coverage $(genhtml -o $CI_PROJECT_DIR/combined_coverage --no-prefix */coverage.info 2>&1 | grep lines | awk '{print $2}')"
     - find $CI_PROJECT_DIR/combined_coverage -type f -name "*.jl" -delete
+
+
 "Documentation":
   stage: docs
   tags:
