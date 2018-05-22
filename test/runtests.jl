@@ -1,5 +1,7 @@
 using StatsUtils
-using Base.Test
+using Compat
+using Compat.Test
+using Compat.LinearAlgebra
 
 import StatsUtils: sqrtcov, sqrtcor
 
@@ -13,7 +15,7 @@ import StatsUtils: sqrtcov, sqrtcor
     weights = [1, 1, 1, 1]
 
     @testset "std" begin
-        @test StatsUtils.std(data, weights) ≈ vec(std(data, 1))
+        @test StatsUtils.std(data, weights) ≈ vec(Compat.std(data, dims=1))
     end
 
     @testset "cov" begin
@@ -46,7 +48,7 @@ import StatsUtils: sqrtcov, sqrtcor
 
     @testset "sqrtcor to sqrtcov" begin
         sqrtcor_ = sqrtcor(data, weights)
-        std_ = diagm(StatsUtils.std(data, weights))
+        std_ = diagm(0 => StatsUtils.std(data, weights))
         sqrtcov_ = sqrtcov(sqrtcor_, std_)
         @test sqrtcov_' * sqrtcov_ ≈ cov(data)
     end

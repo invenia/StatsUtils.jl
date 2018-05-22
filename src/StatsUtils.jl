@@ -1,7 +1,12 @@
+__precompile__()
+
 module StatsUtils
 
+using Compat
+using Compat.LinearAlgebra
+
 _weighted_scale(weights::AbstractVector) = inv(sum(weights) - 1)
-_center(data::AbstractMatrix, dim=1) = data .- mean(data, dim)
+_center(data::AbstractMatrix, dim=1) = data .- Compat.mean(data, dims=dim)
 
 """
     std(data::AbstractMatrix, weights::AbstractVector) -> AbstractVector
@@ -48,7 +53,7 @@ using already centered data and a scale value (`sv`).
 NOTE: you probably don't want to call this directly.
 """
 function std(centered::AbstractMatrix, weights::AbstractVector, sv::Real)
-    return Base.sqrt!(scale!(vec(sum(weights .* centered .^ 2, 1)), sv))
+    return Base.sqrt!(Compat.rmul!(vec(Compat.sum(weights .* centered .^ 2, dims=1)), sv))
 end
 
 """
@@ -134,7 +139,7 @@ using the alread centered data and scale value (`sv`).
 NOTE: you probably don't want to call this directly.
 """
 function sqrtcov(centered::AbstractMatrix, weights::AbstractVector, sv::Real)
-    return scale!(sqrt(weights) .* centered, sqrt(sv))
+    return sqrt.(weights) .* centered .* sqrt(sv)
 end
 
 """
@@ -159,7 +164,7 @@ julia> X = (reshape(1:12, 4, 3) / 12) .^ 2
  0.0625      0.340278  0.840278
  0.111111    0.444444  1.0
 
-julia> statscov_ = StatsUtils.sqrtcov(StatsUtils.sqrtcor(X), diagm(vec(std(X, 1))))
+julia> statscov_ = StatsUtils.sqrtcov(StatsUtils.sqrtcor(X), diagm(0=>vec(std(X, 1))))
 3×3 Array{Float64,2}:
  0.0455378   0.116139    0.18674
  0.0        -0.0126295  -0.025259
@@ -287,7 +292,7 @@ function sqrtcor(data::AbstractMatrix, weights::AbstractVector)
     centered = _center(data, 1)
 
     sqrtcov_ = sqrtcov(centered, weights, sv)
-    return sqrtcov_ * diagm(1 ./ std(centered, weights, sv))
+    return sqrtcov_ * diagm(0 => 1 ./ std(centered, weights, sv))
 end
 
 """
