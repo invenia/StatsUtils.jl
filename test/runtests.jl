@@ -2,6 +2,7 @@ using StatsUtils
 using Compat
 using Compat.Test
 using Compat.LinearAlgebra
+using Compat.Statistics
 
 import StatsUtils: sqrtcov, sqrtcor
 
@@ -15,20 +16,20 @@ import StatsUtils: sqrtcov, sqrtcor
     weights = [1, 1, 1, 1]
 
     @testset "std" begin
-        @test StatsUtils.std(data, weights) ≈ vec(Compat.std(data, dims=1))
+        @test StatsUtils.std(data, weights) ≈ vec(Compat.Statistics.std(data, dims=1))
     end
 
     @testset "cov" begin
-        @test StatsUtils.cov(data, weights) ≈ cov(data)
+        @test StatsUtils.cov(data, weights) ≈ Compat.Statistics.cov(data)
     end
 
     @testset "cor" begin
-        @test StatsUtils.cor(data, weights) ≈ cor(data)
+        @test StatsUtils.cor(data, weights) ≈ Compat.Statistics.cor(data)
     end
 
     @testset "sqrtcov" begin
         X = sqrtcov(data, weights)
-        @test X'X ≈ cov(data)
+        @test X'X ≈ Compat.Statistics.cov(data)
         @test sqrtcov(data) ≈ X
     end
 
@@ -42,7 +43,7 @@ import StatsUtils: sqrtcov, sqrtcor
 
         X = sqrtcor(data, weights)
         @test isapprox(X, expected; rtol=1e-3)
-        @test X'X ≈ cor(data)
+        @test X'X ≈ Compat.Statistics.cor(data)
         @test sqrtcor(data) ≈ X
     end
 
@@ -50,6 +51,6 @@ import StatsUtils: sqrtcov, sqrtcor
         sqrtcor_ = sqrtcor(data, weights)
         std_ = diagm(0 => StatsUtils.std(data, weights))
         sqrtcov_ = sqrtcov(sqrtcor_, std_)
-        @test sqrtcov_' * sqrtcov_ ≈ cov(data)
+        @test sqrtcov_' * sqrtcov_ ≈ Compat.Statistics.cov(data)
     end
 end

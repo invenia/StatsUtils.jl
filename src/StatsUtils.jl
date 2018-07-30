@@ -4,9 +4,16 @@ module StatsUtils
 
 using Compat
 using Compat.LinearAlgebra
+using Compat.Statistics
+
+if isdefined(Base, :sqrt!) # This function is not in Compat.Statistics
+    using Base: sqrt!
+else
+    using Statistics: sqrt!
+end
 
 _weighted_scale(weights::AbstractVector) = inv(sum(weights) - 1)
-_center(data::AbstractMatrix, dim=1) = data .- Compat.mean(data, dims=dim)
+_center(data::AbstractMatrix, dim=1) = data .- Compat.Statistics.mean(data, dims=dim)
 
 """
     std(data::AbstractMatrix, weights::AbstractVector) -> AbstractVector
@@ -53,7 +60,7 @@ using already centered data and a scale value (`sv`).
 NOTE: you probably don't want to call this directly.
 """
 function std(centered::AbstractMatrix, weights::AbstractVector, sv::Real)
-    return Base.sqrt!(Compat.rmul!(vec(Compat.sum(weights .* centered .^ 2, dims=1)), sv))
+    return sqrt!(Compat.rmul!(vec(Compat.sum(weights .* centered .^ 2, dims=1)), sv))
 end
 
 """
