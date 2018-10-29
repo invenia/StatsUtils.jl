@@ -11,4 +11,6 @@ makedocs(
     sitename="StatsUtils.jl",
     authors="Rory-Finnegan",
     assets=["assets/invenia.css"],
+    strict = true,
+    checkdocs = :none,
 )
