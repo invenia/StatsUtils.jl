@@ -1,6 +1,5 @@
 # StatsUtils
-[![stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://doc.invenia.ca/invenia/StatsUtils.jl/master)
-[![latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://doc.invenia.ca/invenia/StatsUtils.jl/master)
+[![latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://invenia.pages.invenia.ca/StatsUtils.jl/)
 [![build status](https://gitlab.invenia.ca/invenia/StatsUtils.jl/badges/master/build.svg)](https://gitlab.invenia.ca/invenia/StatsUtils.jl/commits/master)
 [![coverage](https://gitlab.invenia.ca/invenia/StatsUtils.jl/badges/master/coverage.svg)](https://gitlab.invenia.ca/invenia/StatsUtils.jl/commits/master)
 
@@ -11,4 +10,4 @@ StatsUtils.jl contains various statistics which may be incorporated into [StatsB
 * `sqrtcov(X)`: get square root of covariance matrix such `sqrtcov(X)' * sqrtcov(X) ≈ cov(X)`
 * `sqrtcor(X)`: get square root of pearson correlation matrix such `sqrtcor(X)' * sqrtcor(X) ≈ cor(X)`
 * `cov(X, w)` & `cor(X, w)` for getting weight covariance and correlation.
-* `sqrtcov(sqrtcor_, stds)`: for getting a upper trangular square root of a covariance matrix using the square root of a pearson correlation matrix and a diagonal matrix of standard deviations from the base source data. 
+* `sqrtcov(sqrtcor_, stds)`: for getting a upper trangular square root of a covariance matrix using the square root of a pearson correlation matrix and a diagonal matrix of standard deviations from the base source data.
