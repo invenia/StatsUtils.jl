@@ -5,6 +5,7 @@ module StatsUtils
 using Compat
 using Compat.LinearAlgebra
 using Compat.Statistics
+using StatsBase
 
 if isdefined(Base, :sqrt!) # This function is not in Compat.Statistics
     using Base: sqrt!
@@ -12,11 +13,18 @@ else
     using Statistics: sqrt!
 end
 
-_weighted_scale(weights::AbstractVector) = inv(sum(weights) - 1)
-_center(data::AbstractMatrix, dim=1) = data .- Compat.Statistics.mean(data, dims=dim)
+_weighted_scale(wv::AbstractVector; corrected=true) = inv(sum(wv) - corrected)
+_center(data::AbstractMatrix, wv::AbstractVector, dim=1) = data .- StatsBase.mean(data, weights(wv), dim)
+
+#=
+NOTE: The std functions below are simply so we can use an arbitrary vector as a weight
+vector with the bias correction used in the legacy system. Once the weight types are easier
+to use and we are comfortable using the bias correction code in StatsBase then we should be
+able to phase out most of these methods.
+=#
 
 """
-    std(data::AbstractMatrix, weights::AbstractVector) -> AbstractVector
+    std(data::AbstractMatrix, wv::AbstractVector) -> AbstractVector
 
 Compute the weighted standard deviation along the first axis.
 
@@ -46,21 +54,21 @@ julia> StatsUtils.std(X, w)
  0.174619
 ```
 """
-function std(data::AbstractMatrix, weights::AbstractVector)
-    @assert size(data, 1) == length(weights)
-    return std(_center(data), weights, _weighted_scale(weights))
+function std(data::AbstractMatrix, wv::AbstractVector; corrected=true)
+    @assert size(data, 1) == length(wv)
+    return std(_center(data, wv), wv, _weighted_scale(wv; corrected=corrected))
 end
 
 """
-    std(centered::AbstractMatrix, weights::AbstractVector, sv::Real) -> AbstractVector
+    std(centered::AbstractMatrix, wv::AbstractVector, sv::Real) -> AbstractVector
 
 Computes the remainder of the weighted standard deviation along the first axis
 using already centered data and a scale value (`sv`).
 
 NOTE: you probably don't want to call this directly.
 """
-function std(centered::AbstractMatrix, weights::AbstractVector, sv::Real)
-    return sqrt!(Compat.rmul!(vec(Compat.sum(weights .* centered .^ 2, dims=1)), sv))
+function std(centered::AbstractMatrix, wv::AbstractVector, sv::Real)
+    return sqrt!(Compat.rmul!(vec(Compat.sum(wv .* centered .^ 2, dims=1)), sv))
 end
 
 """
@@ -96,10 +104,10 @@ true
 sqrtcov(data::AbstractMatrix) = sqrtcov(data, ones(size(data, 1)))
 
 """
-    sqrtcov(data::AbstractMatrix, weights::AbstractVector) -> AbstractMatrix
+    sqrtcov(data::AbstractMatrix, wv::AbstractVector) -> AbstractMatrix
 
 Computes the square root of a weighted covariance matrix for the provided `data`
-and `weights`.
+and `wv`.
 
 # Usage
 
@@ -128,13 +136,13 @@ julia> StatsUtils.sqrtcov(X, w)
   0.0393519    0.0949074   0.150463
 ```
 """
-function sqrtcov(data::AbstractMatrix, weights::AbstractVector)
-    @assert size(data, 1) == length(weights)
+function sqrtcov(data::AbstractMatrix, wv::AbstractVector; corrected=true)
+    @assert size(data, 1) == length(wv)
 
-    sv = _weighted_scale(weights)
-    centered = _center(data, 1)
+    sv = _weighted_scale(wv; corrected=corrected)
+    centered = _center(data, wv, 1)
 
-    return sqrtcov(centered, weights, sv)
+    return sqrtcov(centered, wv, sv)
 end
 
 """
@@ -145,8 +153,8 @@ using the alread centered data and scale value (`sv`).
 
 NOTE: you probably don't want to call this directly.
 """
-function sqrtcov(centered::AbstractMatrix, weights::AbstractVector, sv::Real)
-    return sqrt.(weights) .* centered .* sqrt(sv)
+function sqrtcov(centered::AbstractMatrix, wv::AbstractVector, sv::Real)
+    return sqrt.(wv) .* centered .* sqrt(sv)
 end
 
 """
@@ -189,10 +197,10 @@ function sqrtcov(sqrtcor_::AbstractMatrix, stds::AbstractMatrix)
 end
 
 """
-    cov(data::AbstractMatrix, weights::AbstractVector) -> AbstractMatrix
+    cov(data::AbstractMatrix, wv::AbstractVector) -> AbstractMatrix
 
 Computes the weighted covariance matrix for the `data` give the provided
-`weights`.
+`wv`.
 
 # Usage
 
@@ -220,9 +228,9 @@ julia> StatsUtils.cov(X, w)
  0.00764371  0.0190678   0.0304918
 ```
 """
-function cov(data::AbstractMatrix, weights::AbstractVector)
-    @assert size(data, 1) == length(weights)
-    sqrtcov_ = sqrtcov(data, weights)
+function cov(data::AbstractMatrix, wv::AbstractVector; corrected=true)
+    @assert size(data, 1) == length(wv)
+    sqrtcov_ = sqrtcov(data, wv; corrected=corrected)
     return sqrtcov_' * sqrtcov_
 end
 
@@ -259,10 +267,10 @@ true
 sqrtcor(data::AbstractMatrix) = sqrtcor(data, ones(size(data, 1)))
 
 """
-    sqrtcor(data::Abstractmatrix, weights::AbstractVector) -> AbstractMatrix
+    sqrtcor(data::Abstractmatrix, wv::AbstractVector) -> AbstractMatrix
 
 Computes the square root of a weighted pearson correlation matrix given the provided `data`
-and `weights`.
+and `wv`.
 
 # Usage
 
@@ -292,21 +300,21 @@ julia> StatsUtils.sqrtcor(X, w)
 
 ```
 """
-function sqrtcor(data::AbstractMatrix, weights::AbstractVector)
-    @assert size(data, 1) == length(weights)
+function sqrtcor(data::AbstractMatrix, wv::AbstractVector)
+    @assert size(data, 1) == length(wv)
 
-    sv = _weighted_scale(weights)
-    centered = _center(data, 1)
+    sv = _weighted_scale(wv)
+    centered = _center(data, wv, 1)
 
-    sqrtcov_ = sqrtcov(centered, weights, sv)
-    return sqrtcov_ * diagm(0 => 1 ./ std(centered, weights, sv))
+    sqrtcov_ = sqrtcov(centered, wv, sv)
+    return sqrtcov_ * diagm(0 => 1 ./ std(centered, wv, sv))
 end
 
 """
-    cov(data::AbstractMatrix, weights::AbstractVector) -> AbstractMatrix
+    cov(data::AbstractMatrix, wv::AbstractVector) -> AbstractMatrix
 
 Computes the weighted pearson correlation matrix for the `data` give the
-provided `weights`.
+provided `wv`.
 
 # Usage
 
@@ -334,9 +342,9 @@ julia> StatsUtils.cor(X, w)
  0.993213  0.999725  1.0
 ```
 """
-function cor(data::AbstractMatrix, weights::AbstractVector)
-    @assert size(data, 1) == length(weights)
-    sqrtcor_ = sqrtcor(data, weights)
+function cor(data::AbstractMatrix, wv::AbstractVector)
+    @assert size(data, 1) == length(wv)
+    sqrtcor_ = sqrtcor(data, wv)
     return sqrtcor_' * sqrtcor_
 end
 
