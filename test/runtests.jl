@@ -1,10 +1,9 @@
-using StatsUtils
 using LinearAlgebra
 using Statistics
-using Test
-
 using StatsBase
+using StatsUtils
 using StatsUtils: sqrtcov, sqrtcor
+using Test
 
 @testset "StatsUtils" begin
     data = [

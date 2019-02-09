@@ -9,7 +9,6 @@ include:
 variables:
   JULIA_IMAGE: 468665244580.dkr.ecr.us-east-1.amazonaws.com/julia-gitlab-ci:1.0
 
-
 "1.0 (Mac)":
   tags:
     - mac

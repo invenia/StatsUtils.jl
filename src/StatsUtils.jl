@@ -8,7 +8,10 @@ using Statistics: sqrt!
 using StatsBase
 
 _weighted_scale(wv::AbstractVector; corrected=true) = inv(sum(wv) - corrected)
-_center(data::AbstractMatrix, wv::AbstractVector, dim=1) = data .- StatsBase.mean(data, weights(wv), dim)
+
+function _center(data::AbstractMatrix, wv::AbstractVector, dim=1)
+    return data .- StatsBase.mean(data, weights(wv), dim)
+end
 
 #=
 NOTE: The std functions below are simply so we can use an arbitrary vector as a weight

@@ -1,0 +1,6 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+StatsUtils = "d94fc345-0ff4-56ba-a2b2-f5d62e4638cc"
+
+[compat]
+Documenter = "~0.21"
