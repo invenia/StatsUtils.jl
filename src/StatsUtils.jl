@@ -46,9 +46,9 @@ julia> w = collect(1:4)
 
 julia> StatsUtils.std(X, w)
 3-element Array{Float64,1}:
- 0.0440728
- 0.109226
- 0.174619
+ 0.040093768693724004
+ 0.09831833602590415
+ 0.15679346501737126
 ```
 """
 function std(data::AbstractMatrix, wv::AbstractVector; corrected=true)
@@ -78,7 +78,7 @@ return another NxM matrix such that `sqrtcov(data)' * sqrtcov(data) ≈ cov(data
 # Usage
 
 ```jldoctest
-julia> using StatsUtils
+julia> using StatsUtils, Statistics
 
 julia> X = (reshape(1:12, 4, 3) / 12) .^ 2
 4×3 Array{Float64,2}:
@@ -94,7 +94,7 @@ julia> sqrtcov_ = StatsUtils.sqrtcov(X)
   0.00601407   0.0220516   0.0380891
   0.0340797    0.0821922   0.130305
 
-julia> sqrtcov_' * sqrtcov_ ≈ cov(X)
+julia> sqrtcov_' * sqrtcov_ ≈ Statistics.cov(X)
 true
 ```
 """
@@ -127,10 +127,10 @@ julia> w = collect(1:4)
 
 julia> StatsUtils.sqrtcov(X, w)
 4×3 Array{Float64,2}:
- -0.0150463   -0.0428241  -0.0706019
- -0.0114577   -0.0245523  -0.0376469
-  0.00601407   0.0220516   0.0380891
-  0.0393519    0.0949074   0.150463
+ -0.0208333   -0.0578704   -0.0949074
+ -0.0196419   -0.045831    -0.0720201
+ -0.00400938  -0.00400938  -0.00400938
+  0.0277778    0.0648148    0.101852
 ```
 """
 function sqrtcov(data::AbstractMatrix, wv::AbstractVector; corrected=true)
@@ -167,7 +167,7 @@ NOTE: This is just a utility method for a QR matrix decomposition
 # Usage
 
 ```jldoctest
-julia> using StatsUtils
+julia> using StatsUtils, Statistics, LinearAlgebra
 
 julia> X = (reshape(1:12, 4, 3) / 12) .^ 2
 4×3 Array{Float64,2}:
@@ -176,7 +176,7 @@ julia> X = (reshape(1:12, 4, 3) / 12) .^ 2
  0.0625      0.340278  0.840278
  0.111111    0.444444  1.0
 
-julia> statscov_ = StatsUtils.sqrtcov(StatsUtils.sqrtcor(X), diagm(0=>vec(std(X, 1))))
+julia> statscov_ = StatsUtils.sqrtcov(StatsUtils.sqrtcor(X), Diagonal(vec(Statistics.std(X; dims=1))))
 3×3 Array{Float64,2}:
  0.0455378   0.116139    0.18674
  0.0        -0.0126295  -0.025259
@@ -220,9 +220,9 @@ julia> w = collect(1:4)
 
 julia> StatsUtils.cov(X, w)
 3×3 Array{Float64,2}:
- 0.00194241  0.00479306  0.00764371
- 0.00479306  0.0119304   0.0190678
- 0.00764371  0.0190678   0.0304918
+ 0.00160751  0.00392233  0.00623714
+ 0.00392233  0.0096665   0.0154107
+ 0.00623714  0.0154107   0.0245842
 ```
 """
 function cov(data::AbstractMatrix, wv::AbstractVector; corrected=true)
@@ -241,7 +241,7 @@ return another NxM matrix such that `sqrtcor(data)' * sqrtcor(data) ≈ cor(data
 # Usage
 
 ```jldoctest
-julia> using StatsUtils
+julia> using StatsUtils, Statistics
 
 julia> X = (reshape(1:12, 4, 3) / 12) .^ 2
 4×3 Array{Float64,2}:
@@ -257,7 +257,7 @@ julia> sqrtcor_ = StatsUtils.sqrtcor(X)
   0.132068   0.18876    0.202128
   0.748383   0.703558   0.691489
 
-julia> sqrtcor_' * sqrtcor_ ≈ cor(X)
+julia> sqrtcor_' * sqrtcor_ ≈ Statistics.cor(X)
 true
 ```
 """
@@ -290,11 +290,10 @@ julia> w = collect(1:4)
 
 julia> StatsUtils.sqrtcor(X, w)
 4×3 Array{Float64,2}:
- -0.341397  -0.392067  -0.404319
- -0.259973  -0.224784  -0.215594
-  0.136458   0.201889   0.218127
-  0.892884   0.868905   0.861664
-
+ -0.519615  -0.588602   -0.605302
+ -0.489898  -0.466149   -0.459331
+ -0.1       -0.0407795  -0.0255711
+  0.69282    0.659234    0.649592
 ```
 """
 function sqrtcor(data::AbstractMatrix, wv::AbstractVector)
@@ -304,7 +303,7 @@ function sqrtcor(data::AbstractMatrix, wv::AbstractVector)
     centered = _center(data, wv, 1)
 
     sqrtcov_ = sqrtcov(centered, wv, sv)
-    return sqrtcov_ * diagm(0 => 1 ./ std(centered, wv, sv))
+    return sqrtcov_ * Diagonal(1 ./ std(centered, wv, sv))
 end
 
 """
@@ -334,9 +333,9 @@ julia> w = collect(1:4)
 
 julia> StatsUtils.cor(X, w)
 3×3 Array{Float64,2}:
- 1.0       0.995669  0.993213
- 0.995669  1.0       0.999725
- 0.993213  0.999725  1.0
+ 1.0       0.995021  0.992158
+ 0.995021  1.0       0.999675
+ 0.992158  0.999675  1.0
 ```
 """
 function cor(data::AbstractMatrix, wv::AbstractVector)
