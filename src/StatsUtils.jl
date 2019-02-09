@@ -2,16 +2,10 @@ __precompile__()
 
 module StatsUtils
 
-using Compat
-using Compat.LinearAlgebra
-using Compat.Statistics
+using LinearAlgebra
+using Statistics
+using Statistics: sqrt!
 using StatsBase
-
-if isdefined(Base, :sqrt!) # This function is not in Compat.Statistics
-    using Base: sqrt!
-else
-    using Statistics: sqrt!
-end
 
 _weighted_scale(wv::AbstractVector; corrected=true) = inv(sum(wv) - corrected)
 _center(data::AbstractMatrix, wv::AbstractVector, dim=1) = data .- StatsBase.mean(data, weights(wv), dim)
@@ -68,7 +62,7 @@ using already centered data and a scale value (`sv`).
 NOTE: you probably don't want to call this directly.
 """
 function std(centered::AbstractMatrix, wv::AbstractVector, sv::Real)
-    return sqrt!(Compat.rmul!(vec(Compat.sum(wv .* centered .^ 2, dims=1)), sv))
+    return sqrt!(rmul!(vec(sum(wv .* centered .^ 2, dims=1)), sv))
 end
 
 """
