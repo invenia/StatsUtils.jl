@@ -2,7 +2,6 @@ using Documenter, StatsUtils
 
 makedocs(
     modules=[StatsUtils],
-    format=:html,
     pages=[
         "Home" => "index.md",
         "API" => "api.md",
