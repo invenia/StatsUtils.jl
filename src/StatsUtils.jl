@@ -69,6 +69,61 @@ function std(centered::AbstractMatrix, wv::AbstractVector, sv::Real)
 end
 
 """
+    sqrtcov(F::Cholesky)
+    sqrtcov(F::CholeskyPivoted)
+    sqrtcov(F::LinearAlgebra.QRCompactWY)
+
+Handle the extraction of the square root from a given covariance Factorization.
+Needed because implementation details such as pivoting mean additional handling of the
+Factorization needed to be taken into account.
+
+
+```jldoctest
+julia> using StatsUtils, LinearAlgebra
+
+julia> X = (reshape(1:9, 3, 3) / 12) .^ 2
+3×3 Array{Float64,2}:
+ 0.00694444  0.111111  0.340278
+ 0.0277778   0.173611  0.444444
+ 0.0625      0.25      0.5625
+
+julia> U = Matrix(UpperTriangular(X))
+3×3 Array{Float64,2}:
+ 0.00694444  0.111111  0.340278
+ 0.0         0.173611  0.444444
+ 0.0         0.0       0.5625
+
+julia> A = U' * U
+3×3 Array{Float64,2}:
+ 4.82253e-5   0.000771605  0.00236304
+ 0.000771605  0.0424865    0.114969
+ 0.00236304   0.114969     0.629726
+
+julia> C = cholesky(A, Val(true))
+LinearAlgebra.CholeskyPivoted{Float64,Array{Float64,2}}
+U factor with rank 3:
+3×3 UpperTriangular{Float64,Array{Float64,2}}:
+ 0.793553  0.144879  0.0029778
+  ⋅        0.146617  0.00232022
+  ⋅         ⋅        0.00582877
+permutation:
+3-element Array{Int64,1}:
+ 3
+ 2
+ 1
+
+julia> StatsUtils.sqrtcov(C)' * StatsUtils.sqrtcov(C) ≈ A
+true
+```
+"""
+sqrtcov(F::LinearAlgebra.QRCompactWY) = F.R
+sqrtcov(F::Cholesky) = F.U
+function sqrtcov(F::CholeskyPivoted)
+    ip = invperm(F.p)
+    return F.U[ip, ip]
+end
+
+"""
     sqrtcov(data::AbstractMatrix) -> AbstractMatrix
 
 Computes the square root of a covariance matrix for the provided `data`.
