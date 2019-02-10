@@ -37,6 +37,17 @@ using Test
 
         X = sqrtcov(data, w2; corrected=false)
         @test X'X ≈ StatsBase.cov(data, StatsBase.weights(w2), 1; corrected=false)
+
+        @testset "Factorizations" begin
+            B = (reshape(2:10, 3, 3) / 12) .^ 2
+            A = B' * B
+
+            chol_fact = cholesky(A, Val(false))
+            @test sqrtcov(chol_fact) == chol_fact.U
+
+            qr_fact = qr(A)
+            @test sqrtcov(qr_fact) == qr_fact.R
+        end
     end
 
     @testset "sqrtcor" begin
