@@ -27,9 +27,9 @@ version = "0.6.0"
 
 [[Documenter]]
 deps = ["Base64", "DocStringExtensions", "InteractiveUtils", "LibGit2", "Logging", "Markdown", "Pkg", "REPL", "Random", "Test", "Unicode"]
-git-tree-sha1 = "0b834915b5521c626386c8b48d8fc61577bc642f"
+git-tree-sha1 = "59b71e0d3e9fa5966ffc4a25ff0ca8e0efa5e16b"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.21.2"
+version = "0.21.3"
 
 [[InteractiveUtils]]
 deps = ["LinearAlgebra", "Markdown"]
@@ -114,9 +114,9 @@ version = "0.27.0"
 
 [[StatsUtils]]
 deps = ["LinearAlgebra", "Statistics", "StatsBase"]
-path = "/Users/nick/Documents/code/StatsUtils.jl"
+path = ".."
 uuid = "d94fc345-0ff4-56ba-a2b2-f5d62e4638cc"
-version = "0.1.0+"
+version = "0.2.0+"
 
 [[Test]]
 deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
