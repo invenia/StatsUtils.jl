@@ -7,8 +7,8 @@ using StatsBase
 
 _weighted_scale(wv::AbstractVector; corrected=true) = inv(sum(wv) - corrected)
 
-function _center(data::AbstractMatrix, wv::AbstractVector, dim=1)
-    return data .- StatsBase.mean(data, weights(wv), dim)
+function _center(data::AbstractMatrix, wv::AbstractVector; dims=1)
+    return data .- StatsBase.mean(data, weights(wv); dims=dims)
 end
 
 include("cov.jl")

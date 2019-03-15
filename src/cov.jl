@@ -122,7 +122,7 @@ function sqrtcov(data::AbstractMatrix, wv::AbstractVector; corrected=true)
     @assert size(data, 1) == length(wv)
 
     sv = _weighted_scale(wv; corrected=corrected)
-    centered = _center(data, wv, 1)
+    centered = _center(data, wv; dims=1)
 
     return sqrtcov(centered, wv, sv)
 end
