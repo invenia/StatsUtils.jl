@@ -8,7 +8,7 @@ makedocs(
     ],
     repo="https://gitlab.invenia.ca/invenia/StatsUtils.jl/blob/{commit}{path}#L{line}",
     sitename="StatsUtils.jl",
-    authors="Rory-Finnegan",
+    authors="Invenia",
     assets=["assets/invenia.css"],
     strict = true,
     checkdocs = :none,

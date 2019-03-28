@@ -1,6 +1,9 @@
 module StatsUtils
 
+using Distributions
 using LinearAlgebra
+using PDMats
+using PSDMats
 using Statistics
 using Statistics: sqrt!
 using StatsBase
