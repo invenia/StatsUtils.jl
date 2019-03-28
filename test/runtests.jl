@@ -1,4 +1,7 @@
+using Distributions
 using LinearAlgebra
+using PDMats
+using PSDMats
 using Statistics
 using StatsBase
 using StatsUtils
@@ -38,15 +41,42 @@ using Test
         X = sqrtcov(data, w2; corrected=false)
         @test X'X ≈ StatsBase.cov(data, StatsBase.weights(w2), 1; corrected=false)
 
-        @testset "Factorizations" begin
-            B = (reshape(2:10, 3, 3) / 12) .^ 2
-            A = B' * B
+        # for testsets below
+        B = (reshape(2:10, 3, 3) / 12) .^ 2
+        A = B' * B
 
+
+        @testset "PSDMat" begin
+            chol_piv = cholesky(A, Val(true))
+            Σ_psd = PSDMat(chol_piv)
+            @test isequal(sqrtcov(chol_piv), sqrtcov(Σ_psd))
+        end
+
+        @testset "PDMat" begin
+            chol = cholesky(A, Val(false))
+            Σ_pd = PDMat(chol)
+            @test isequal(sqrtcov(chol), sqrtcov(Σ_pd))
+        end
+
+        @testset "Factorizations" begin
             chol_fact = cholesky(A, Val(false))
             @test sqrtcov(chol_fact) == chol_fact.U
 
             qr_fact = qr(A)
             @test sqrtcov(qr_fact) == qr_fact.R
+        end
+
+        @testset "MvNormal" begin
+            # FullNormal
+            dist = MvNormal(ones(size(A, 1)), A)
+            chol = cholesky(A)
+            @test isequal(sqrtcov(dist), sqrtcov(chol))
+
+            # DiagNormal
+            Σ = Diagonal(0.1:0.1:0.5)
+            dist = MvNormal(ones(size(Σ, 1)), Σ)
+            @test isequal(sqrtcov(dist), sqrt(cov(dist)))
+            @test isequal(sqrtcov(dist), sqrt(Σ))
         end
     end
 

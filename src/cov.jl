@@ -1,4 +1,14 @@
 """
+    sqrtcov(X::MvNormal) -> AbstractMatrix
+    sqrtcov(Σ::PDMat) -> AbstractMatrix
+    sqrtcov(Σ::PSDMat) -> AbstractMatrix
+    sqrtcov(Σ::PDiagMat) -> AbstractMatrix
+"""
+sqrtcov(X::MvNormal) = sqrtcov(X.Σ)
+sqrtcov(Σ::Union{PDMat, PSDMat}) = sqrtcov(Σ.chol)
+sqrtcov(Σ::PDiagMat) = sqrt.(Matrix(Σ))
+
+"""
     sqrtcov(F::Cholesky) -> AbstractMatrix
     sqrtcov(F::CholeskyPivoted) -> AbstractMatrix
     sqrtcov(F::LinearAlgebra.QRCompactWY) -> AbstractMatrix
