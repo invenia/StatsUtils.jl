@@ -75,7 +75,7 @@ using Test
             # DiagNormal
             Σ = Diagonal(0.1:0.1:0.5)
             dist = MvNormal(ones(size(Σ, 1)), Σ)
-            @test isequal(sqrtcov(dist), sqrt(cov(dist)))
+            @test isequal(sqrtcov(dist), sqrt(Distributions.cov(dist)))
             @test isequal(sqrtcov(dist), sqrt(Σ))
         end
     end
