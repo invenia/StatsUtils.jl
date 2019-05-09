@@ -1,11 +1,13 @@
+using Distances
 using Distributions
 using LinearAlgebra
 using PDMats
 using PSDMats
+using Random
 using Statistics
 using StatsBase
 using StatsUtils
-using StatsUtils: sqrtcov, sqrtcor
+using StatsUtils: Resampler, sqrtcov, sqrtcor
 using Test
 
 @testset "StatsUtils" begin
@@ -102,5 +104,76 @@ using Test
         std_ = diagm(0 => StatsUtils.std(data, w1))
         sqrtcov_ = sqrtcov(sqrtcor_, std_)
         @test sqrtcov_' * sqrtcov_ ≈ Statistics.cov(data)
+    end
+
+    @testset "Resampler" begin
+        rng = MersenneTwister(1234)
+
+        @testset "Univariate" begin
+            obs = collect(1:12)
+
+            @testset "Equally Weighted" begin
+                # Linearly increasing analytic weights
+                wv = aweights(ones(12))
+
+                s = Resampler(obs, wv)
+                X = rand(rng, s, 100000)
+
+                # The mean values of the samples should roughly match the mean of the
+                # original observation
+                @test isapprox(mean(X), mean(obs); atol=0.01)
+            end
+
+            @testset "Linearly Weighted" begin
+                # Linearly increasing analytic weights
+                wv = aweights(collect(0.083:0.083:1.0))
+
+                s = Resampler(obs, wv)
+                X = rand(rng, s, 100000)
+
+                # The mean of the samples should not match the mean of the
+                # original observation
+                @test !isapprox(mean(X), mean(obs); atol=0.01)
+
+                # 12 should be sampled the most
+                @test mode(X) == 12
+            end
+        end
+
+        @testset "Multivariate" begin
+            v = [1.2, 0.7, -0.3, 5.4, -2.8]
+            # Define different observations via arbitrary operations on v
+            obs = hcat(
+                v, reverse(v), sort(v), sin.(v), cos.(v), tan.(v),
+                v / 100, v * 2, abs.(v), log.(abs.(v)), v .^ 2, v * 10,
+            )
+
+            @testset "Equally Weighted" begin
+                # Linearly increasing analytic weights
+                wv = aweights(ones(12))
+
+                s = Resampler(obs, wv)
+                X = rand(rng, s, 100000)
+
+                # The mean values of each variable in the samples should roughly match
+                # the means of the original observation
+                @test nrmsd(mean(X; dims=2), mean(obs; dims=2)) < 0.001
+            end
+
+            @testset "Linearly Weighted" begin
+                # Linearly increasing analytic weights
+                wv = aweights(collect(0.083:0.083:1.0))
+
+                s = Resampler(obs, wv)
+                X = rand(rng, s, 100000)
+
+                # The mean values of each variable of the samples should not match the
+                # means of the original observation
+                @test nrmsd(mean(X; dims=2), mean(obs; dims=2)) > 0.1
+
+                # v * 10 should be sampled the most
+                @test vec(mapslices(mode, X; dims=2)) == v * 10
+            end
+        end
     end
 end

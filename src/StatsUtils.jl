@@ -4,6 +4,7 @@ using Distributions
 using LinearAlgebra
 using PDMats
 using PSDMats
+using Random
 using Statistics
 using Statistics: sqrt!
 using StatsBase
@@ -17,5 +18,6 @@ end
 include("cov.jl")
 include("cor.jl")
 include("std.jl")
+include("resampler.jl")
 
 end  # module
