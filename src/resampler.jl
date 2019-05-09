@@ -3,6 +3,15 @@ struct Resampler{F<:VariateForm, S<:ValueSupport} <: Sampleable{F, S}
     wv::AbstractWeights
 end
 
+"""
+    Resampler(obs::AbstractArray, wv::AbstractWeights)
+
+A Resampler is a subtype of Distributions.Sampleable which randomly selects
+observations from the raw input data (`obs`) based on the weights (`wv`) provided.
+
+This type supports univariate, multivariate and matrixvariate forms, so `obs` can
+be a vector of values, matrix of values or a vector of matrices.
+"""
 function Resampler(obs::T, wv::AbstractWeights) where T<:AbstractArray
     F = _variate_form(T)
     S = _value_support(eltype(T))

@@ -175,5 +175,15 @@ using Test
                 @test vec(mapslices(mode, X; dims=2)) == v * 10
             end
         end
+        @testset "Matrixvariate" begin
+            # NOTE: Since we've already testing the sampling behaviour we just want to
+            # check that we've implement the Distributions API correctly
+            s = Resampler([rand(4, 3) for i in 1:10], aweights(rand(10)))
+            X = rand(rng, s)
+        end
+
+        @testset "DimensionMismatch" begin
+            @test_throws DimensionMismatch Resampler(rand(10), aweights(collect(1:12)))
+        end
     end
 end
