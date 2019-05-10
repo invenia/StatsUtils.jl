@@ -4,9 +4,12 @@ using Distributions
 using LinearAlgebra
 using PDMats
 using PSDMats
+using Random
 using Statistics
 using Statistics: sqrt!
 using StatsBase
+
+export WeightedResampler
 
 _weighted_scale(wv::AbstractVector; corrected=true) = inv(sum(wv) - corrected)
 
@@ -17,5 +20,6 @@ end
 include("cov.jl")
 include("cor.jl")
 include("std.jl")
+include("resampler.jl")
 
 end  # module
