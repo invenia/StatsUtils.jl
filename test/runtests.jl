@@ -7,7 +7,7 @@ using Random
 using Statistics
 using StatsBase
 using StatsUtils
-using StatsUtils: Resampler, sqrtcov, sqrtcor
+using StatsUtils: sqrtcov, sqrtcor
 using Test
 
 @testset "StatsUtils" begin
@@ -106,7 +106,7 @@ using Test
         @test sqrtcov_' * sqrtcov_ ≈ Statistics.cov(data)
     end
 
-    @testset "Resampler" begin
+    @testset "WeightedResampler" begin
         rng = MersenneTwister(1234)
 
         @testset "Univariate" begin
@@ -116,7 +116,7 @@ using Test
                 # Constant analytic weights
                 wv = aweights(ones(12))
 
-                s = Resampler(obs, wv)
+                s = WeightedResampler(obs, wv)
                 X = rand(rng, s, 100000)
 
                 # The mean values of the samples should roughly match the mean of the
@@ -128,7 +128,7 @@ using Test
                 # Linearly increasing analytic weights
                 wv = aweights(collect(1/12:1/12:1.0))
 
-                s = Resampler(obs, wv)
+                s = WeightedResampler(obs, wv)
                 X = rand(rng, s, 100000)
 
                 # The mean of the samples should not match the mean of the
@@ -152,7 +152,7 @@ using Test
                 # Constant analytic weights
                 wv = aweights(ones(12))
 
-                s = Resampler(obs, wv)
+                s = WeightedResampler(obs, wv)
                 X = rand(rng, s, 100000)
 
                 # The mean values of each variable in the samples should roughly match
@@ -164,7 +164,7 @@ using Test
                 # Linearly increasing analytic weights
                 wv = aweights(collect(0.083:0.083:1.0))
 
-                s = Resampler(obs, wv)
+                s = WeightedResampler(obs, wv)
                 X = rand(rng, s, 100000)
 
                 # The mean values of each variable of the samples should not match the
@@ -178,12 +178,12 @@ using Test
         @testset "Matrixvariate" begin
             # NOTE: Since we've already testing the sampling behaviour we just want to
             # check that we've implement the Distributions API correctly
-            s = Resampler([rand(4, 3) for i in 1:10], aweights(rand(10)))
-            X = rand(rng, s)
+            s = WeightedResampler([rand(4, 3) for i in 1:10], aweights(rand(10)))
+            X = rand(s)
         end
 
         @testset "DimensionMismatch" begin
-            @test_throws DimensionMismatch Resampler(rand(10), aweights(collect(1:12)))
+            @test_throws DimensionMismatch WeightedResampler(rand(10), aweights(collect(1:12)))
         end
     end
 end

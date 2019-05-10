@@ -9,6 +9,8 @@ using Statistics
 using Statistics: sqrt!
 using StatsBase
 
+export WeightedResampler
+
 _weighted_scale(wv::AbstractVector; corrected=true) = inv(sum(wv) - corrected)
 
 function _center(data::AbstractMatrix, wv::AbstractVector; dims=1)
