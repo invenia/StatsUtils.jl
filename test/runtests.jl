@@ -126,7 +126,7 @@ using Test
 
             @testset "Linearly Weighted" begin
                 # Linearly increasing analytic weights
-                wv = aweights(collect(0.083:0.083:1.0))
+                wv = aweights(collect(1/12:1/12:1.0))
 
                 s = Resampler(obs, wv)
                 X = rand(rng, s, 100000)
