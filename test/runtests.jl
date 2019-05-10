@@ -113,7 +113,7 @@ using Test
             obs = collect(1:12)
 
             @testset "Equally Weighted" begin
-                # Linearly increasing analytic weights
+                # Constant analytic weights
                 wv = aweights(ones(12))
 
                 s = Resampler(obs, wv)
