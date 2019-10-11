@@ -1,5 +1,6 @@
 """
     sqrtcov(X::MvNormal) -> AbstractMatrix
+    sqrtcov(X::IndexedDistribution) -> AbstractMatrix
     sqrtcov(Σ::PDMat) -> AbstractMatrix
     sqrtcov(Σ::PSDMat) -> AbstractMatrix
     sqrtcov(Σ::PDiagMat) -> AbstractMatrix
@@ -9,6 +10,7 @@ sqrtcov(Σ::PDiagMat) = sqrt.(Matrix(Σ))
 sqrtcov(Σ::Union{PDMat, PSDMat}) = sqrtcov(Σ.chol)
 # Do not use`Distributions.cov` as it returns a `Matrix`; we want original type of `Σ`.
 sqrtcov(X::MvNormal) = sqrtcov(X.Σ)
+sqrtcov(id::IndexedDistribution) = sqrtcov(parent(id))
 
 """
     sqrtcov(F::Cholesky) -> AbstractMatrix

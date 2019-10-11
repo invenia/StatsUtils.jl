@@ -1,6 +1,7 @@
 module StatsUtils
 
 using Distributions
+using IndexedDistributions
 using LinearAlgebra
 using PDMats
 using PSDMats
