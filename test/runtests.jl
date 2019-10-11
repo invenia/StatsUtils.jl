@@ -1,5 +1,6 @@
 using Distances
 using Distributions
+using IndexedDistributions
 using LinearAlgebra
 using PDMats
 using PSDMats
@@ -77,6 +78,23 @@ using Test
             # DiagNormal
             Σ = Diagonal(0.1:0.1:0.5)
             dist = MvNormal(ones(size(Σ, 1)), Σ)
+            @test isequal(sqrtcov(dist), sqrt(Distributions.cov(dist)))
+            @test isequal(sqrtcov(dist), sqrt(Σ))
+        end
+
+        @testset "IndexedDistribution" begin
+            # FullNormal
+            dist = MvNormal(ones(size(A, 1)), A)
+            names = "n" .* string.(collect(1:length(dist)))
+            id = IndexedDistribution(dist, names)
+            chol = cholesky(A)
+            @test isequal(sqrtcov(id), sqrtcov(chol))
+
+            # DiagNormal
+            Σ = Diagonal(0.1:0.1:0.5)
+            dist = MvNormal(ones(size(Σ, 1)), Σ)
+            names = "n" .* string.(collect(1:length(dist)))
+            id = IndexedDistribution(dist, names)
             @test isequal(sqrtcov(dist), sqrt(Distributions.cov(dist)))
             @test isequal(sqrtcov(dist), sqrt(Σ))
         end
