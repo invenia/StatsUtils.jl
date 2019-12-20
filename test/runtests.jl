@@ -204,4 +204,13 @@ using Test
             @test_throws DimensionMismatch WeightedResampler(rand(10), aweights(collect(1:12)))
         end
     end
+
+    @testset "exponential_weights" begin
+        λ = 1.1  # must be 0 < λ <= 1
+        @test_throws ArgumentError exponential_weights(λ, 10)
+        wv1 = exponential_weights(1, 10)
+        @test minimum(wv1) == maximum(wv1)  # all have weight 1
+        wv2 = exponential_weights(0.5, 10)
+        @test first(wv2) < last(wv2)  # weights should be in increasing order
+    end  # exponential_weights
 end
