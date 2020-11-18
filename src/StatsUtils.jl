@@ -4,7 +4,7 @@ using Distributions
 using IndexedDistributions
 using LinearAlgebra
 using PDMats
-using PSDMats
+using PDMatsExtras
 using Random
 using Statistics
 using Statistics: sqrt!
