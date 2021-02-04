@@ -48,6 +48,11 @@ using Test
         B = (reshape(2:10, 3, 3) / 12) .^ 2
         A = B' * B
 
+        # Woodbury Matrix
+
+        D = Diagonal([1.,2,3])
+        S = Diagonal([4.,5,6])
+        W = WoodburyPDMat(B, D, S)
 
         @testset "PSDMat" begin
             chol_piv = cholesky(A, Val(true))
@@ -59,6 +64,16 @@ using Test
             chol = cholesky(A, Val(false))
             Σ_pd = PDMat(chol)
             @test isequal(sqrtcov(chol), sqrtcov(Σ_pd))
+        end
+
+        @testset "WoodburyPDMat" begin
+            Σ_pd = PDMat(Matrix(Symmetric(W)))
+            @test isequal(sqrtcov(W), sqrtcov(Σ_pd))
+            @test sqrtcov(W)' * sqrtcov(W) ≈ W
+            chol = cholesky(W' * W, Val(false))
+            Σ_pd = PDMat(chol)
+            @test isequal(sqrtcov(chol), sqrtcov(Σ_pd))
+
         end
 
         @testset "Factorizations" begin
@@ -80,6 +95,11 @@ using Test
             dist = MvNormal(ones(size(Σ, 1)), Σ)
             @test isequal(sqrtcov(dist), sqrt(Distributions.cov(dist)))
             @test isequal(sqrtcov(dist), sqrt(Σ))
+
+            # WoodburyPDMat
+            dist = MvNormal(ones(size(W, 1)), W)
+            @test isequal(sqrtcov(dist), sqrtcov(W))
+
         end
 
         @testset "IndexedDistribution" begin
