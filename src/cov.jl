@@ -1,5 +1,6 @@
 """
     sqrtcov(X::MvNormal) -> AbstractMatrix
+    sqrtcov(X::WoodburyPDMat) -> AbstractMatrix
     sqrtcov(X::IndexedDistribution) -> AbstractMatrix
     sqrtcov(Σ::PDMat) -> AbstractMatrix
     sqrtcov(Σ::PSDMat) -> AbstractMatrix
@@ -8,6 +9,7 @@
 sqrtcov(Σ::PDiagMat) = sqrt.(Matrix(Σ))
 # No public API for assessing `chol`; see https://github.com/JuliaStats/PDMats.jl/issues/88
 sqrtcov(Σ::Union{PDMat, PSDMat}) = sqrtcov(Σ.chol)
+sqrtcov(X::WoodburyPDMat) = sqrtcov(PDMat(Symmetric(Matrix(X))))
 # Do not use`Distributions.cov` as it returns a `Matrix`; we want original type of `Σ`.
 sqrtcov(X::MvNormal) = sqrtcov(X.Σ)
 sqrtcov(id::IndexedDistribution) = sqrtcov(parent(id))
