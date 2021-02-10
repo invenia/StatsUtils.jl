@@ -67,7 +67,7 @@ using Test
         end
 
         @testset "WoodburyPDMat" begin
-            Σ_pd = PDMat(Matrix(Symmetric(W)))
+            Σ_pd = PSDMat(Matrix(Symmetric(W)))
             @test isequal(sqrtcov(W), sqrtcov(Σ_pd))
             @test sqrtcov(W)' * sqrtcov(W) ≈ W
             chol = cholesky(W' * W, Val(false))
