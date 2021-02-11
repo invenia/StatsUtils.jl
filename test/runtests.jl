@@ -1,5 +1,6 @@
 using Distances
 using Distributions
+using Distributions: GenericMvTDist
 using IndexedDistributions
 using LinearAlgebra
 using PDMats
@@ -21,14 +22,46 @@ using Test
     w1 = ones(4)
     w2 = [0.25, 0.33, 0.81, 0.14]
 
+    # for testsets below
+    B = (reshape(2:10, 3, 3) / 12) .^ 2
+    A = B' * B
+
+    # Woodbury Matrix
+    D = Diagonal([1.,2,3])
+    S = Diagonal([4.,5,6])
+    W = WoodburyPDMat(B, D, S)
+
     @testset "std" begin
         @test StatsUtils.std(data, w1) ≈ vec(Statistics.std(data, dims=1))
         @test StatsUtils.std(data, w2; corrected=false) ≈ vec(StatsBase.std(data, StatsBase.weights(w2), 1; corrected=false))
     end
 
     @testset "cov" begin
+        # on data
         @test StatsUtils.cov(data, w1) ≈ Statistics.cov(data)
         @test StatsUtils.cov(data, w2; corrected=false) ≈ StatsBase.cov(data, StatsBase.weights(w2), 1; corrected=false)
+
+        # on distribution
+        @testset "AbstractPDMat type $(typeof(pd))" for pd in [
+            PDiagMat(diag(D)), PDMat(Symmetric(A)), PSDMat(Symmetric(A))
+        ]
+            @testset "distribution type $(typeof(dist))" for dist in [
+                MvNormal(ones(size(pd, 1)), pd),
+                GenericMvTDist(2.2, ones(size(pd, 1)), pd),
+            ]
+                # the resulting covariance should preserve the AbstractPDMat type
+                @test typeof(StatsUtils.cov(dist)) == typeof(pd)
+
+                @testset "IndexedDistribution" begin
+                    names = "n" .* string.(collect(1:length(dist)))
+                    id = IndexedDistribution(dist, names)
+                    @test typeof(StatsUtils.cov(dist)) == typeof(pd)
+                end
+
+            end
+            # throw error when the dof of MvT is < 2
+            @test_throws ArgumentError StatsUtils.cov(GenericMvTDist(1.8, ones(size(pd, 1)), pd))
+        end
     end
 
     @testset "cor" begin
@@ -43,16 +76,6 @@ using Test
 
         X = sqrtcov(data, w2; corrected=false)
         @test X'X ≈ StatsBase.cov(data, StatsBase.weights(w2), 1; corrected=false)
-
-        # for testsets below
-        B = (reshape(2:10, 3, 3) / 12) .^ 2
-        A = B' * B
-
-        # Woodbury Matrix
-
-        D = Diagonal([1.,2,3])
-        S = Diagonal([4.,5,6])
-        W = WoodburyPDMat(B, D, S)
 
         @testset "PSDMat" begin
             chol_piv = cholesky(A, Val(true))

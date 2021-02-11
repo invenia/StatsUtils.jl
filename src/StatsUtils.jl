@@ -1,6 +1,7 @@
 module StatsUtils
 
 using Distributions
+using Distributions: GenericMvTDist
 using IndexedDistributions
 using LinearAlgebra
 using PDMats

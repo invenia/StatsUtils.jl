@@ -231,3 +231,22 @@ function cov(data::AbstractMatrix, wv::AbstractVector; corrected=true)
     sqrtcov_ = sqrtcov(data, wv; corrected=corrected)
     return sqrtcov_' * sqrtcov_
 end
+
+"""
+extract the covariance matrix from a distribution in its original `AbstractPDMat` type
+"""
+function cov(dist::MvNormal{M,C}) where {M, C<:AbstractPDMat}
+    return dist.Σ
+end
+
+function cov(dist::GenericMvTDist)
+    if dist.df <= 2
+        throw(ArgumentError(
+            "covariance only exists for MvT distribution when its degree of freedom is > 2," *
+            "but got $(dist.df)"
+        ))
+    end
+    return dist.df / (dist.df - 2) * dist.Σ
+end
+
+cov(dist::IndexedDistribution) = cov(parent(dist))
