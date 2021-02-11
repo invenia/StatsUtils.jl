@@ -22,6 +22,7 @@ end
 include("weights.jl")
 include("cov.jl")
 include("cor.jl")
+include("scale.jl")
 include("std.jl")
 include("resampler.jl")
 

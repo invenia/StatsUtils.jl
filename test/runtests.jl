@@ -64,6 +64,30 @@ using Test
         end
     end
 
+    @testset "scale" begin
+        # univariate distribution
+        @test StatsUtils.scale(Normal()) == 1.0
+
+        # multivariate distribution
+        @testset "AbstractPDMat type $(typeof(pd))" for pd in [
+            PDiagMat(diag(D)), PDMat(Symmetric(A)), PSDMat(Symmetric(A)), W
+        ]
+            @testset "distribution type $(typeof(dist))" for dist in [
+                MvNormal(ones(size(pd, 1)), pd),
+                GenericMvTDist(2.2, ones(size(pd, 1)), pd),
+            ]
+                # the resulting covariance should preserve the AbstractPDMat type
+                @test typeof(StatsUtils.scale(dist)) == typeof(pd)
+
+                @testset "IndexedDistribution" begin
+                    names = "n" .* string.(collect(1:length(dist)))
+                    id = IndexedDistribution(dist, names)
+                    @test typeof(StatsUtils.scale(dist)) == typeof(pd)
+                end
+            end
+        end
+    end
+
     @testset "cor" begin
         @test StatsUtils.cor(data, w1) ≈ Statistics.cor(data)
         @test StatsUtils.cor(data, w2) ≈ StatsBase.cor(data, StatsBase.weights(w2), 1)
