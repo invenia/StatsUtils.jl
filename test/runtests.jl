@@ -43,7 +43,7 @@ using Test
 
         # on distribution
         @testset "AbstractPDMat type $(typeof(pd))" for pd in [
-            PDiagMat(diag(D)), PDMat(Symmetric(A)), PSDMat(Symmetric(A))
+            PDiagMat(diag(D)), PDMat(Symmetric(A)), PSDMat(Symmetric(A)), W
         ]
             @testset "distribution type $(typeof(dist))" for dist in [
                 MvNormal(ones(size(pd, 1)), pd),
