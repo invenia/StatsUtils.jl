@@ -65,10 +65,6 @@ using Test
     end
 
     @testset "scale" begin
-        # univariate distribution
-        @test StatsUtils.scale(Normal()) == 1.0
-
-        # multivariate distribution
         @testset "AbstractPDMat type $(typeof(pd))" for pd in [
             PDiagMat(diag(D)), PDMat(Symmetric(A)), PSDMat(Symmetric(A)), W
         ]
