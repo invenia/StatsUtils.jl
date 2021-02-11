@@ -11,7 +11,7 @@ sqrtcov(Σ::PDiagMat) = sqrt.(Matrix(Σ))
 sqrtcov(Σ::Union{PDMat, PSDMat}) = sqrtcov(Σ.chol)
 sqrtcov(X::WoodburyPDMat) = sqrtcov(PSDMat(Symmetric(Matrix(X))))
 # Do not use`Distributions.cov` as it returns a `Matrix`; we want original type of `Σ`.
-sqrtcov(X::MvNormal) = sqrtcov(X.Σ)
+sqrtcov(X::MvNormal) = sqrtcov(StatsUtils.cov(X))
 sqrtcov(id::IndexedDistribution) = sqrtcov(parent(id))
 
 """
@@ -233,13 +233,16 @@ function cov(data::AbstractMatrix, wv::AbstractVector; corrected=true)
 end
 
 """
-extract the covariance matrix from a distribution in its original `AbstractPDMat` type
+    cov(dist::MvNormal{T, C}) where {T, C<:AbstractPDMat} -> C
+    cov(dist::GenericMvTDist{T, C}) where {T, C<:AbstractPDMat} -> C
+
+extract the covariance matrix from a distribution preserving its original `AbstractPDMat` type
 """
-function cov(dist::MvNormal{M,C}) where {M, C<:AbstractPDMat}
+function cov(dist::MvNormal{T, C}) where {T, C<:AbstractPDMat}
     return dist.Σ
 end
 
-function cov(dist::GenericMvTDist)
+function cov(dist::GenericMvTDist{T, C}) where {T, C<:AbstractPDMat}
     if dist.df <= 2
         throw(ArgumentError(
             "covariance only exists for MvT distribution when its degree of freedom is > 2," *
