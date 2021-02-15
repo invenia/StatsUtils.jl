@@ -55,7 +55,7 @@ using Test
                 @testset "IndexedDistribution" begin
                     names = "n" .* string.(collect(1:length(dist)))
                     id = IndexedDistribution(dist, names)
-                    @test typeof(StatsUtils.cov(dist)) == typeof(pd)
+                    @test typeof(StatsUtils.cov(id)) == typeof(pd)
                 end
 
             end
