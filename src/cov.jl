@@ -236,7 +236,7 @@ end
     cov(dist::MvNormal{T, C}) where {T, C<:AbstractPDMat} -> C
     cov(dist::GenericMvTDist{T, C}) where {T, C<:AbstractPDMat} -> C
 
-extract the covariance matrix from a distribution preserving its original `AbstractPDMat` type
+Extract the covariance matrix from a distribution preserving its original `AbstractPDMat` type.
 """
 function cov(dist::MvNormal{T, C}) where {T, C<:AbstractPDMat}
     return dist.Σ
