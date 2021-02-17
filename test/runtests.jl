@@ -51,11 +51,14 @@ using Test
             ]
                 # the resulting covariance should preserve the AbstractPDMat type
                 @test typeof(StatsUtils.cov(dist)) == typeof(pd)
+                # the value is consistent with what `Distributions.cov` returns
+                @test Matrix(StatsUtils.cov(dist)) ≈ Matrix(Distributions.cov(dist)) atol=1e-9
 
                 @testset "IndexedDistribution" begin
                     names = "n" .* string.(collect(1:length(dist)))
                     id = IndexedDistribution(dist, names)
                     @test typeof(StatsUtils.cov(id)) == typeof(pd)
+                    @test Matrix(StatsUtils.cov(id)) ≈ Matrix(Distributions.cov(id)) atol=1e-9
                 end
 
             end
