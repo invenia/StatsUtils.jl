@@ -1,6 +1,7 @@
 module StatsUtils
 
 using Distributions
+using Distributions: GenericMvTDist
 using IndexedDistributions
 using LinearAlgebra
 using PDMats
@@ -21,6 +22,7 @@ end
 include("weights.jl")
 include("cov.jl")
 include("cor.jl")
+include("scale.jl")
 include("std.jl")
 include("resampler.jl")
 
