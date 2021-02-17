@@ -5,6 +5,11 @@
     sqrtcov(Σ::PDMat) -> AbstractMatrix
     sqrtcov(Σ::PSDMat) -> AbstractMatrix
     sqrtcov(Σ::PDiagMat) -> AbstractMatrix
+
+NOTE: the `sqrtcov` dispatches on `AbstractPDMat` and Factorization is a bit confusing. The
+`AbstractPDMat` and Factorization don't necessarily need to be covariance matrix. They can
+be, e.g. scale, matrix. The issue describing the problem in detail with potential longer
+term solutions can be found https://gitlab.invenia.ca/invenia/StatsUtils.jl/-/issues/8
 """
 sqrtcov(Σ::PDiagMat) = sqrt.(Matrix(Σ))
 # No public API for assessing `chol`; see https://github.com/JuliaStats/PDMats.jl/issues/88
@@ -236,7 +241,9 @@ end
     cov(dist::MvNormal{T, C}) where {T, C<:AbstractPDMat} -> C
     cov(dist::GenericMvTDist{T, C}) where {T, C<:AbstractPDMat} -> C
 
-Extract the covariance matrix from a distribution preserving its original `AbstractPDMat` type.
+Extract the covariance matrix from a distribution preserving its original `AbstractPDMat`
+type. The reason we don't use `Distributions.cov` is because it densifies the matrix type
+so the `AbstractPDMat` type is not preserved.
 """
 function cov(dist::MvNormal{T, C}) where {T, C<:AbstractPDMat}
     return dist.Σ
@@ -245,8 +252,8 @@ end
 function cov(dist::GenericMvTDist{T, C}) where {T, C<:AbstractPDMat}
     if dist.df <= 2
         throw(ArgumentError(
-            "covariance only exists for MvT distribution when its degree of freedom is > 2," *
-            "but got $(dist.df)"
+            "Covariance is a finite number only for MvT distribution whose " *
+            "degree of freedom is > 2, but got $(dist.df)"
         ))
     end
     return dist.df / (dist.df - 2) * dist.Σ
