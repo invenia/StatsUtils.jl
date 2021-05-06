@@ -2,6 +2,7 @@ using Distances
 using Distributions
 using Distributions: GenericMvTDist
 using IndexedDistributions
+using KeyedDistributions
 using LinearAlgebra
 using PDMats
 using PDMatsExtras
@@ -54,9 +55,9 @@ using Test
                 # the value is consistent with what `Distributions.cov` returns
                 @test Matrix(StatsUtils.cov(dist)) ≈ Matrix(Distributions.cov(dist)) atol=1e-9
 
-                @testset "IndexedDistribution" begin
+                @testset "$T" for T in (IndexedDistribution, KeyedDistribution)
                     names = "n" .* string.(collect(1:length(dist)))
-                    id = IndexedDistribution(dist, names)
+                    id = T(dist, names)
                     @test typeof(StatsUtils.cov(id)) == typeof(pd)
                     @test Matrix(StatsUtils.cov(id)) ≈ Matrix(Distributions.cov(id)) atol=1e-9
                 end
@@ -78,9 +79,9 @@ using Test
                 # the resulting covariance should preserve the AbstractPDMat type
                 @test typeof(StatsUtils.scale(dist)) == typeof(pd)
 
-                @testset "IndexedDistribution" begin
+                @testset "$T" for T in (IndexedDistribution, KeyedDistribution)
                     names = "n" .* string.(collect(1:length(dist)))
-                    id = IndexedDistribution(dist, names)
+                    id = T(dist, names)
                     @test typeof(StatsUtils.scale(dist)) == typeof(pd)
                 end
             end
@@ -148,11 +149,11 @@ using Test
 
         end
 
-        @testset "IndexedDistribution" begin
+        @testset "$T" for T in (IndexedDistribution, KeyedDistribution)
             # FullNormal
             dist = MvNormal(ones(size(A, 1)), A)
             names = "n" .* string.(collect(1:length(dist)))
-            id = IndexedDistribution(dist, names)
+            id = T(dist, names)
             chol = cholesky(A)
             @test isequal(sqrtcov(id), sqrtcov(chol))
 
@@ -160,7 +161,7 @@ using Test
             Σ = Diagonal(0.1:0.1:0.5)
             dist = MvNormal(ones(size(Σ, 1)), Σ)
             names = "n" .* string.(collect(1:length(dist)))
-            id = IndexedDistribution(dist, names)
+            id = T(dist, names)
             @test isequal(sqrtcov(dist), sqrt(Distributions.cov(dist)))
             @test isequal(sqrtcov(dist), sqrt(Σ))
         end

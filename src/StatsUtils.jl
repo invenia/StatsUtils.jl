@@ -2,7 +2,8 @@ module StatsUtils
 
 using Distributions
 using Distributions: GenericMvTDist
-using IndexedDistributions
+using IndexedDistributions: IndexedDistribution, parent
+using KeyedDistributions: KeyedDistribution, distribution
 using LinearAlgebra
 using PDMats
 using PDMatsExtras
