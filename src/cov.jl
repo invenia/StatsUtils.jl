@@ -2,6 +2,7 @@
     sqrtcov(X::MvNormal) -> AbstractMatrix
     sqrtcov(X::WoodburyPDMat) -> AbstractMatrix
     sqrtcov(X::IndexedDistribution) -> AbstractMatrix
+    sqrtcov(X::KeyedDistribution) -> AbstractMatrix
     sqrtcov(Σ::PDMat) -> AbstractMatrix
     sqrtcov(Σ::PSDMat) -> AbstractMatrix
     sqrtcov(Σ::PDiagMat) -> AbstractMatrix
@@ -18,6 +19,7 @@ sqrtcov(X::WoodburyPDMat) = sqrtcov(PSDMat(Symmetric(Matrix(X))))
 # Do not use`Distributions.cov` as it returns a `Matrix`; we want original type of `Σ`.
 sqrtcov(X::MvNormal) = sqrtcov(StatsUtils.cov(X))
 sqrtcov(id::IndexedDistribution) = sqrtcov(parent(id))
+sqrtcov(kd::KeyedDistribution) = sqrtcov(distribution(kd))
 
 """
     sqrtcov(F::Cholesky) -> AbstractMatrix
@@ -260,3 +262,5 @@ function cov(dist::GenericMvTDist{T, C}) where {T, C<:AbstractPDMat}
 end
 
 cov(dist::IndexedDistribution) = cov(parent(dist))
+cov(dist::KeyedDistribution) = cov(distribution(dist))
+
