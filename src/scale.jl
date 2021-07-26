@@ -8,5 +8,4 @@ function scale(dist::Union{MvNormal, GenericMvTDist})
     return dist.Σ
 end
 
-scale(dist::IndexedDistribution) = scale(parent(dist))
 scale(dist::KeyedDistribution) = scale(distribution(dist))
