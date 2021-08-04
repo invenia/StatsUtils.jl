@@ -1,11 +1,10 @@
 name = "StatsUtils"
 uuid = "d94fc345-0ff4-56ba-a2b2-f5d62e4638cc"
 authors = "Invenia Technical Computing"
-version = "1.7.0"
+version = "2.0.0"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
-IndexedDistributions = "f8b19354-d7d2-57c1-87c2-c7771792bf73"
 KeyedDistributions = "2576fb08-064d-4cab-b15d-8dda7fcb9a6d"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 PDMats = "90014a1f-27ba-587c-ab20-58faa44d9150"
@@ -16,7 +15,6 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 Distances = "0.8"
-IndexedDistributions = "1.2, 2"
 PDMatsExtras = "2.2"
 StatsBase = "0.29, 0.30, 0.31, 0.32, 0.33"
 julia = "1"
