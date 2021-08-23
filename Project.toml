@@ -1,7 +1,7 @@
 name = "StatsUtils"
 uuid = "d94fc345-0ff4-56ba-a2b2-f5d62e4638cc"
 authors = "Invenia Technical Computing"
-version = "2.1.0"
+version = "2.2.0"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
@@ -15,6 +15,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 Distances = "0.8"
+Distributions = "0.24"
 KeyedDistributions = "0.1"
 PDMatsExtras = "2.2"
 StatsBase = "0.29, 0.30, 0.31, 0.32, 0.33"
