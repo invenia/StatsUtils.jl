@@ -260,3 +260,4 @@ function cov(dist::GenericMvTDist{T, C}) where {T, C<:AbstractPDMat}
 end
 
 cov(dist::KeyedDistribution) = cov(distribution(dist))
+cov(dist::MixtureModel) = Distributions.cov(dist)
