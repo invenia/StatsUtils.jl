@@ -148,6 +148,12 @@ using Test
 
         end
 
+        @testset "Mixture" begin
+            dist = MvNormal(ones(size(A, 1)), A)
+            mix = MixtureModel([dist, dist], [0.5, 0.5])
+            @test isequal(cov(mix), cov(dist))
+        end
+
         @testset "KeyedDistribution" begin
             # FullNormal
             dist = MvNormal(ones(size(A, 1)), A)
