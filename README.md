@@ -1,7 +1,4 @@
 # StatsUtils
-[![latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://invenia.pages.invenia.ca/StatsUtils.jl/)
-[![build status](https://gitlab.invenia.ca/invenia/StatsUtils.jl/badges/master/build.svg)](https://gitlab.invenia.ca/invenia/StatsUtils.jl/commits/master)
-[![coverage](https://gitlab.invenia.ca/invenia/StatsUtils.jl/badges/master/coverage.svg)](https://gitlab.invenia.ca/invenia/StatsUtils.jl/commits/master)
 
 StatsUtils.jl contains various statistics which may be incorporated into [StatsBase.jl](https://github.com/JuliaStats/StatsBase.jl) at a later date.
 
